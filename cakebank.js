@@ -67,38 +67,38 @@ window.onload = function() {
     document.addEventListener("keydown", movecake);
 }
 
-function update() {
-    requestAnimationFrame(update);
+function placePipes() {
     if (gameOver) {
         return;
     }
-    context.clearRect(0, 0, board.width, board.height);
 
-    //cake
-    velocityY += gravity;
-    // cake.y += velocityY;
-    cake.y = Math.max(cake.y + velocityY, 0); //apply gravity to current cake.y, limit the cake.y to top of the canvas
-    context.drawImage(cakeImg, cake.x, cake.y, cake.width, cake.height);
+    let openingSpace = board.height / 4;
+    let distanceBetweenPipes = boardWidth / 2; // Adjust this value for the desired distance between double pipes
 
-    if (cake.y > board.height) {
-        gameOver = true;
+    for (let i = 0; i < 2; i++) {
+        let randomPipeY = pipeY - pipeHeight / 4 - Math.random() * (pipeHeight / 2);
+
+        let topPipe = {
+            img: topPipeImg,
+            x: pipeX + i * distanceBetweenPipes,
+            y: randomPipeY,
+            width: pipeWidth,
+            height: pipeHeight,
+            passed: false
+        };
+        pipeArray.push(topPipe);
+
+        let bottomPipe = {
+            img: bottomPipeImg,
+            x: pipeX + i * distanceBetweenPipes,
+            y: randomPipeY + pipeHeight + openingSpace,
+            width: pipeWidth,
+            height: pipeHeight,
+            passed: false
+        };
+        pipeArray.push(bottomPipe);
     }
-
-    //pipes
-    for (let i = 0; i < pipeArray.length; i++) {
-        let pipe = pipeArray[i];
-        pipe.x += velocityX;
-        context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
-
-        if (!pipe.passed && cake.x > pipe.x + pipe.width) {
-            score += 0.5; //0.5 because there are 2 pipes! so 0.5*2 = 1, 1 for each set of pipes
-            pipe.passed = true;
-        }
-
-        if (detectCollision(cake, pipe)) {
-            gameOver = true;
-        }
-    }
+}
 
     //clear pipes
     while (pipeArray.length > 0 && pipeArray[0].x < -pipeWidth) {
